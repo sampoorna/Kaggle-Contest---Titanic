@@ -53,7 +53,7 @@ X = X[(len(X_valid)+1):-1]
 y = y[(len(X_valid)+1):-1]
 
 ### Build model
-clf = svm.SVC(kernel = 'rbf', gamma = 0.01)
+clf = svm.SVC(kernel = 'rbf', gamma = 1)
 clf.fit(X, y)
 score = clf.score(X, y)
 print score
