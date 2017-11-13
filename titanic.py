@@ -61,10 +61,10 @@ predictions = clf.predict(X_pred)
 
 print predictions
 
-write_file = "Output.csv"
+write_file = "output.csv"
 with open(write_file, "wb") as output:
 	writer = csv.writer(output, delimiter=',')
-	writer.writerow(["PassengerId,Survived"])
+	writer.writerow(['PassengerId','Survived'])
 	for ind in range(len(predictions)):
 		writer.writerow([ids[ind], predictions[ind]])
 
