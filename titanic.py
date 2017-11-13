@@ -53,7 +53,7 @@ X = X[(len(X_valid)+1):-1]
 y = y[(len(X_valid)+1):-1]
 
 ### Build model
-clf = svm.SVC(kernel = 'rbf', gamma = 0.1)
+clf = svm.SVC(kernel = 'rbf', gamma = 0.01)
 clf.fit(X, y)
 score = clf.score(X, y)
 print score
@@ -61,7 +61,7 @@ predictions = clf.predict(X_pred)
 
 print predictions
 
-write_file = "output.csv"
+write_file = "Output.csv"
 with open(write_file, "wb") as output:
 	writer = csv.writer(output, delimiter=',')
 	writer.writerow(["PassengerId,Survived"])
