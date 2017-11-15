@@ -55,19 +55,19 @@ y_valid = y[0:len(X_valid)]
 X = X[(len(X_valid)+1):-1]
 y = y[(len(X_valid)+1):-1]
 
+#######################################################################################
 ### Parameter tuning using grid-search
-C_range = np.logspace(0, 5, 13)
+#C_range = np.logspace(1, 5, 20)
 #gamma_range = np.logspace(-3, 3, 13)
-print C_range
-param_grid = dict(gamma=gamma_range, C=C_range)
-cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
-grid = GridSearchCV(SVC(), param_grid=param_grid, cv=cv)
-grid.fit(X, y)
-
-print "The best parameters are ", grid.best_params_, "with a score of", grid.best_score_
+#print C_range
+#param_grid = dict(C=C_range)
+#cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+#grid = GridSearchCV(SVC(), param_grid=param_grid, cv=cv)
+#grid.fit(X, y)
+#print "The best parameters are ", grid.best_params_, "with a score of", grid.best_score_
 
 ### Build model
-clf = svm.SVC(kernel = 'rbf', gamma = grid.best_params_['gamma'], C = grid.best_params_['C'], cache_size=500) # 1 overfits more than 0.1 and 0.01
+clf = svm.SVC(kernel = 'rbf', gamma = 0.001, C = 560, cache_size=500) # 1 overfits more than 0.1 and 0.01
 clf.fit(X, y)
 score = clf.score(X, y)
 print score

@@ -11,4 +11,4 @@ Observations:
    - Incorporating grid search to find the best C and gamma
      - The best gamma is consistently 0.001
      - The best C is in the range of 10^3 but varies from 300-500
-   
+     - Chosen C = 560 based on best performance on Kaggle
