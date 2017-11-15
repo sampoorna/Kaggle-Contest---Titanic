@@ -57,7 +57,7 @@ y = y[(len(X_valid)+1):-1]
 
 ### Parameter tuning using grid-search
 C_range = np.logspace(0, 5, 13)
-gamma_range = np.logspace(-6, 3, 13)
+#gamma_range = np.logspace(-3, 3, 13)
 print C_range
 param_grid = dict(gamma=gamma_range, C=C_range)
 cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
