@@ -25,6 +25,6 @@ Observations:
 	 - Club others into a separate class 'Other'
    - Replace NaN values
      - For Age and Fare, replace by median
-	 - For Embarked, only 3 rows in the training set have NaN here, so we choose 'S'  (Southampton as port of embarkation) arbitrarily.
+	 - For Embarked, only 2 rows in the training set have NaN here. We choose 'C'  (Charbourg as port of embarkation) as they paid $80 for first class travel that coincides with how much others from that port and that class paid. ---> This gets us the best score yet
    
 	 

@@ -18,11 +18,10 @@ ids = test_df['PassengerId'].tolist()
 #test_df.drop(['PassengerId', 'Ticket', 'Cabin', 'Name'], axis = 1)
 
 ### Replace NaN values
-train_df.fillna({'Age' : train_df['Age'].median(), 'Embarked' : 'S', 
+train_df.fillna({'Age' : train_df['Age'].median(), 'Embarked' : 'C', 
 	'Fare' : train_df['Fare'].median()}, inplace = True)
 
-test_df.fillna({'Age' : test_df['Age'].median(), 'Embarked' : 'S', 
-    'Fare' : test_df['Fare'].median()}, inplace = True)
+test_df.fillna({'Age' : test_df['Age'].median(), 'Fare' : test_df['Fare'].median()}, inplace = True)
 
 ### Training labels
 y = train_df['Survived'].tolist()
@@ -69,14 +68,14 @@ print "Train/test split: COMPLETE"
 
 #######################################################################################
 ### Parameter tuning using grid-search
-C_range = np.logspace(1, 5, 20)
-gamma_range = np.logspace(-3, 3, 13)
-print C_range
-param_grid = dict(C=C_range)
-cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
-grid = GridSearchCV(SVC(kernel = 'rbf', gamma=0.001), param_grid=param_grid, cv=cv)
-grid.fit(X, y)
-print "The best parameters are ", grid.best_params_, "with a score of", grid.best_score_
+#C_range = np.logspace(2, 5, 10)
+#gamma_range = np.logspace(-3, 3, 13)
+#print C_range
+#param_grid = dict(C=C_range)
+#cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+#grid = GridSearchCV(SVC(kernel = 'rbf', gamma=0.001), param_grid=param_grid, cv=cv)
+#grid.fit(X, y)
+#print "The best parameters are ", grid.best_params_, "with a score of", grid.best_score_
 
 ### Build model
 clf = svm.SVC(kernel = 'rbf', gamma = 0.001, C = 560, cache_size=500) # 1 overfits more than 0.1 and 0.01
