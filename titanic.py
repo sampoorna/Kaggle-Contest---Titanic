@@ -7,6 +7,13 @@ from sklearn.svm import SVC
 import pandas as pd
 import random
 
+def applyMother(row):
+	if row['Age'] >= 18 and row['Title'] != 'Miss.' and row['Parch'] and row['Sex'] == 'female' > 0:
+		return 1
+
+	return 0
+		
+
 ### Read files
 train_df = pd.read_csv('train.csv')
 test_df = pd.read_csv('test.csv')
@@ -39,6 +46,15 @@ train_df.Title.replace(['Dona.', 'Capt.', 'Col.', 'Don.', 'Dr.', 'Jonkheer.', 'L
 test_df.Title.replace(['Ms.', 'Mlle.', 'Mme.'], ['Miss.', 'Miss.', 'Mrs.'], inplace=True)
 test_df.Title.replace(['Dona.', 'Capt.', 'Col.', 'Don.', 'Dr.', 'Jonkheer.', 'Lady.', 'Major.', 'Rev.', 'Sir.', 'the'], ['Other', 'Mr.', 'Mr.', 'Other', 'Other', 'Mr.', 'Other', 'Mr.', 'Mr.', 'Mr.', 'Other'], inplace=True)
 
+### Create new feature Family_Size
+train_df['Family_Size'] = train_df['SibSp'] + train_df['Parch'] + 1
+test_df['Family_Size'] = test_df['SibSp'] + test_df['Parch'] + 1
+#print train_df.Family_Size.unique()
+
+### Create new feature Mother
+train_df['Mother'] = train_df.apply(applyMother, axis=1)
+test_df['Mother'] = test_df.apply(applyMother, axis=1)
+
 ### Replace non-numeric values with numbers
 train_df.Sex.replace(['male', 'female'], [0, 1], inplace=True)
 test_df.Sex.replace(['male', 'female'], [0, 1], inplace=True)
@@ -51,8 +67,10 @@ test_df.Embarked.replace(['C', 'S', 'Q'], [0, 1, 2], inplace=True)
 print "Initial data processing: COMPLETE"
 
 ### Transform dataframe to lists
-X = train_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']].values.tolist()
-X_pred = test_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']].values.tolist()
+#X = train_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
+#X_pred = test_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
+X = train_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother']].values.tolist()
+X_pred = test_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother']].values.tolist()
 
 ### Randomly shuffle training instances
 combo = list(zip(X, y))
