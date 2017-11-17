@@ -82,13 +82,17 @@ for dataset in combined:
 	group_names = ['Baby', 'Child', 'Teenager', 'Student', 'Young Adult', 'Adult', 'Senior']
 	group_values = [0, 1, 2, 3, 4, 5, 6]
 	dataset['AgeGroup'] = pd.cut(dataset.Age, bins, labels=group_values)
-	print pd.crosstab(dataset['AgeGroup'], dataset['Title'])
+	#print pd.crosstab(dataset['AgeGroup'], dataset['Title'])
 
 	### Create new feature Family_Size
 	dataset['Family_Size'] = dataset['SibSp'] + dataset['Parch'] + 1
 
 	### Create new feature Mother
 	dataset['Mother'] = dataset.apply(applyMother, axis=1)
+	
+	### Create new feature IsAlone
+	dataset['IsAlone'] = dataset.Family_Size.map({1: 0})
+	dataset.fillna({'IsAlone': 1}, inplace=True)
 
 	### Replace non-numeric values with numbers
 	dataset.Sex.replace(['male', 'female'], [0, 1], inplace=True)
@@ -99,8 +103,8 @@ for dataset in combined:
 ### Transform dataframe to lists
 #X = train_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
 #X_pred = test_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
-X = train_df[['Pclass', 'Sex', 'AgeGroup', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
-X_pred = test_df[['Pclass', 'Sex', 'AgeGroup', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
+X = train_df[['Pclass', 'Sex', 'AgeGroup', 'SibSp', 'Parch', 'Fare', 'Embarked', 'IsAlone', 'Mother', 'Title', 'Family_Size']].values.tolist()
+X_pred = test_df[['Pclass', 'Sex', 'AgeGroup', 'SibSp', 'Parch', 'Fare', 'Embarked', 'IsAlone', 'Mother', 'Title', 'Family_Size']].values.tolist()
 
 ### Randomly shuffle training instances
 combo = list(zip(X, y))

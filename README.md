@@ -44,3 +44,14 @@ Observations:
    - Create new feature AgeGroup
      - Group passengers into age groups based on age: 'Baby' if between 0 and 5, 'Child' if between 5 and 12, 'Teenager' if between 12 and 18, 'Student' if between 18 and 25, 'Young Adult' if between 25 and 35, 'Adult' if between 35 and 60, 'Senior' if between 60 and 120
 	 - Using ['Pclass', 'Sex', 'AgeGroup', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool'] gives us the best results yet
+	 - Using ['Pclass', 'Sex', 'AgeGroup', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title'] gives us the same error ---> Negligible added utility of including CabinBool
+   - Create new feature IsAlone
+     - Boolean value, = 1 if they don't have any family members aboard, otherwise 0.
+	 - Using ['Pclass', 'Sex', 'AgeGroup', 'SibSp', 'Parch', 'Fare', 'Embarked', 'IsAlone', 'Mother', 'Title'] is just the same as using Family_Size instead of IsAlone
+	 - Using ['Pclass', 'Sex', 'AgeGroup', 'SibSp', 'Parch', 'Fare', 'Embarked', 'IsAlone', 'Mother', 'Title', 'Family_Size'] ---> best performance
+   - Convert all ordinal features to numeric features
+     - Tried using values that are vastly different for some features like Title and Embarked, but got lower test error
+
+3. Using random forests
+   - Gives poorer performance than SVM
+   - Gives a very high training error (~94%), so is likely overfitting
