@@ -20,8 +20,9 @@ Observations:
 	 
 2. Feature engineering
    - Create new feature Title, extract and normalize the titles from Name
-     - Convert 'Mlle.' and 'Ms.' to 'Miss.', and 'Mme.' to 'Mrs.'
-	 - Convert some rare titles ('Capt.', 'Col.', 'Rev.') to 'Mr.', which are observed to be only male in this dataset (not being sexist), and would most likely require one to be an adult
+     - Convert 'Mlle' and 'Ms' to 'Miss', and 'Mme' to 'Mrs'
+	 - Convert some rare titles ('Capt', 'Col', 'Rev') to 'Mr', which are observed to be only male in this dataset (not being sexist), and would most likely require one to be an adult
+	 - Convert titles indicative of royalty/nobility ('Lady', 'Sir', 'Countess') to class 'Royal'
 	 - Club others into a separate class 'Other'
    - Replace NaN values
      - For Age replace by median

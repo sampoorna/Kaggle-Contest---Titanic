@@ -3,6 +3,8 @@ import csv
 from sklearn import svm
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import KFold
+from sklearn.metrics import make_scorer, accuracy_score
 from sklearn.svm import SVC
 import pandas as pd
 import random
@@ -18,6 +20,23 @@ def applyMedianFare(row, df):
 	if math.isnan(row['Fare']):
 		return df[(df.Pclass == row['Pclass']) & (df.Embarked == row['Embarked'])]['Fare'].median()
 	return row['Fare']
+	
+def run_kfold(clf, X_all, y_all):
+	kf = KFold(n_splits=10)
+	outcomes = []
+	fold = 0
+	for train_index, test_index in kf.split(X_all):
+		#print train_index, test_index
+		fold += 1
+		X_train, X_test = X_all[train_index], X_all[test_index]
+		y_train, y_test = y_all[train_index], y_all[test_index]
+		clf.fit(X_train, y_train)
+		predictions = clf.predict(X_test)
+		accuracy = accuracy_score(y_test, predictions)
+		outcomes.append(accuracy)
+		print("Fold {0} accuracy: {1}".format(fold, accuracy))     
+	mean_outcome = np.mean(outcomes)
+	print("Mean Accuracy: {0}".format(mean_outcome))
 		
 ### Read files
 train_df = pd.read_csv('train.csv')
@@ -31,6 +50,7 @@ ids = test_df['PassengerId'].tolist()
 y = train_df['Survived'].tolist()
 
 combined = [train_df, test_df]
+#print pd.crosstab(train_df['Age'], train_df['Survived'])
 
 for dataset in combined:
 	### Drop ticket info as it is not likely to be very informative
@@ -43,7 +63,7 @@ for dataset in combined:
 	### Extract titles, replace uncommon variations and add as column to dataframe
 	dataset['Title'] = dataset.Name.str.extract(' ([A-Za-z]+)\.', expand=False)
 	dataset.Title.replace(['Ms', 'Mlle', 'Mme'], ['Miss', 'Miss', 'Mrs'], inplace=True)
-	dataset.Title.replace(['Dona', 'Capt', 'Col', 'Don', 'Dr', 'Jonkheer', 'Lady', 'Major', 'Rev', 'Sir', 'Countess'], ['Other', 'Mr', 'Mr', 'Other', 'Other', 'Mr', 'Royal', 'Mr', 'Mr', 'Royal', 'Royal'], inplace=True) 
+	dataset.Title.replace(['Dona', 'Capt', 'Col', 'Don', 'Dr', 'Jonkheer', 'Lady', 'Major', 'Rev', 'Sir', 'Countess'], ['Other', 'Mr', 'Mr', 'Other', 'Other', 'Mr', 'Royal', 'Mr', 'Mr', 'Royal', 'Royal'], inplace=True)
 
 	### Create new feature Family_Size
 	dataset['Family_Size'] = dataset['SibSp'] + dataset['Parch'] + 1
@@ -88,6 +108,11 @@ print "Train/test split: COMPLETE"
 
 ### Build model
 clf = svm.SVC(kernel = 'rbf', gamma = 0.001, C = 560, cache_size=500) # 1 overfits more than 0.1 and 0.01
+
+### Run k-fold cross validation
+run_kfold(clf, np.array(X), np.array(y))
+
+### Fit model on entire data for final predictions
 clf.fit(X, y)
 print "Model learning: COMPLETE"
 score = clf.score(X, y)
