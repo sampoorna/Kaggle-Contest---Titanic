@@ -24,7 +24,8 @@ Observations:
 	 - Convert some rare titles ('Capt.', 'Col.', 'Rev.') to 'Mr.', which are observed to be only male in this dataset (not being sexist), and would most likely require one to be an adult
 	 - Club others into a separate class 'Other'
    - Replace NaN values
-     - For Age and Fare, replace by median
+     - For Age replace by median
+	 - For Fare, replace by median of the same class and port of embarkation
 	 - For Embarked, only 2 rows in the training set have NaN here. We choose 'C'  (Charbourg as port of embarkation) as they paid $80 for first class travel that coincides with how much others from that port and that class paid. ---> This gets us the best score yet
    - Create new feature Family_Size based on Sibsp and Parch
      - Family_Size = Sibsp + Parch + 1 (to include the passenger themselves)

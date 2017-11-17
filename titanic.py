@@ -6,14 +6,19 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 import pandas as pd
 import random
+import math
 
 def applyMother(row):
 	if row['Age'] >= 18 and row['Title'] != 'Miss.' and row['Parch'] and row['Sex'] == 'female' > 0:
 		return 1
-
 	return 0
 		
-
+def applyMedianFare(row, df):
+	#print row['Fare']
+	if math.isnan(row['Fare']):
+		return df[(df.Pclass == row['Pclass']) & (df.Embarked == row['Embarked'])]['Fare'].median()
+	return row['Fare']
+		
 ### Read files
 train_df = pd.read_csv('train.csv')
 test_df = pd.read_csv('test.csv')
@@ -25,10 +30,11 @@ ids = test_df['PassengerId'].tolist()
 #test_df.drop(['PassengerId', 'Ticket', 'Cabin', 'Name'], axis = 1)
 
 ### Replace NaN values
-train_df.fillna({'Age' : train_df['Age'].median(), 'Embarked' : 'C', 
-	'Fare' : train_df['Fare'].median()}, inplace = True)
+train_df.fillna({'Age' : train_df['Age'].median(), 'Embarked' : 'C'}, inplace = True)
+train_df['Fare'] = train_df.apply(applyMedianFare, df=train_df, axis=1)
 
-test_df.fillna({'Age' : test_df['Age'].median(), 'Fare' : test_df['Fare'].median()}, inplace = True)
+test_df.fillna({'Age' : test_df['Age'].median()}, inplace = True)
+test_df['Fare'] = test_df.apply(applyMedianFare, df=test_df, axis=1)
 
 ### Training labels
 y = train_df['Survived'].tolist()
