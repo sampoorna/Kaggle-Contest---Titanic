@@ -25,7 +25,7 @@ Observations:
 	 - Convert titles indicative of royalty/nobility ('Lady', 'Sir', 'Countess') to class 'Royal'
 	 - Club others into a separate class 'Other'
    - Replace NaN values
-     - For Age replace by median
+     - For Age replace by median of the same Title
 	 - For Fare, replace by median of the same class and port of embarkation
 	 - For Embarked, only 2 rows in the training set have NaN here. We choose 'C'  (Charbourg as port of embarkation) as they paid $80 for first class travel that coincides with how much others from that port and that class paid. ---> This gets us the best score yet
    - Create new feature Family_Size based on Sibsp and Parch
@@ -41,3 +41,6 @@ Observations:
    - Create new feature CabinBool
      - Boolean value, = 1 if Cabin has a recorded value, 0 otherwise
 	 - Gives lower score than using ['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother', 'Title']
+   - Create new feature AgeGroup
+     - Group passengers into age groups based on age: 'Baby' if between 0 and 5, 'Child' if between 5 and 12, 'Teenager' if between 12 and 18, 'Student' if between 18 and 25, 'Young Adult' if between 25 and 35, 'Adult' if between 35 and 60, 'Senior' if between 60 and 120
+	 - Using ['Pclass', 'Sex', 'AgeGroup', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool'] gives us the best results yet

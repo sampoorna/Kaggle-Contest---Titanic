@@ -21,6 +21,11 @@ def applyMedianFare(row, df):
 		return df[(df.Pclass == row['Pclass']) & (df.Embarked == row['Embarked'])]['Fare'].median()
 	return row['Fare']
 	
+def fillAge(row, df):
+	if math.isnan(row['Age']):
+		return df[(df.Title == row['Title'])]['Age'].mean()
+	return row['Age']
+	
 def runKFold(clf, X_all, y_all):
 	kf = KFold(n_splits=10)
 	outcomes = []
@@ -57,7 +62,8 @@ for dataset in combined:
 	dataset.drop(['Ticket'], axis = 1)
 
 	### Replace NaN values
-	dataset.fillna({'Age' : dataset['Age'].median(), 'Embarked' : 'C'}, inplace = True)
+	#dataset.fillna({'Age' : dataset['Age'].median(), 'Embarked' : 'C'}, inplace = True)
+	dataset.fillna({'Embarked' : 'C'}, inplace = True)
 	dataset['Fare'] = dataset.apply(applyMedianFare, df=dataset, axis=1)
 	
 	### Binarize Cabin values to create new feature CabinBool
@@ -67,6 +73,16 @@ for dataset in combined:
 	dataset['Title'] = dataset.Name.str.extract(' ([A-Za-z]+)\.', expand=False)
 	dataset.Title.replace(['Ms', 'Mlle', 'Mme'], ['Miss', 'Miss', 'Mrs'], inplace=True)
 	dataset.Title.replace(['Dona', 'Capt', 'Col', 'Don', 'Dr', 'Jonkheer', 'Lady', 'Major', 'Rev', 'Sir', 'Countess'], ['Other', 'Mr', 'Mr', 'Other', 'Other', 'Mr', 'Royal', 'Mr', 'Mr', 'Royal', 'Royal'], inplace=True)
+	
+	### Replace Age NaN values
+	dataset['Age'] = dataset.apply(fillAge, df=dataset, axis=1)
+	
+	### Create new feature AgeGroup
+	bins = (0, 5, 12, 18, 25, 35, 60, 120)
+	group_names = ['Baby', 'Child', 'Teenager', 'Student', 'Young Adult', 'Adult', 'Senior']
+	group_values = [0, 1, 2, 3, 4, 5, 6]
+	dataset['AgeGroup'] = pd.cut(dataset.Age, bins, labels=group_values)
+	print pd.crosstab(dataset['AgeGroup'], dataset['Title'])
 
 	### Create new feature Family_Size
 	dataset['Family_Size'] = dataset['SibSp'] + dataset['Parch'] + 1
@@ -83,8 +99,8 @@ for dataset in combined:
 ### Transform dataframe to lists
 #X = train_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
 #X_pred = test_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
-X = train_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
-X_pred = test_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
+X = train_df[['Pclass', 'Sex', 'AgeGroup', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
+X_pred = test_df[['Pclass', 'Sex', 'AgeGroup', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
 
 ### Randomly shuffle training instances
 combo = list(zip(X, y))
