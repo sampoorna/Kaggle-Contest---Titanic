@@ -43,7 +43,7 @@ for dataset in combined:
 	### Extract titles, replace uncommon variations and add as column to dataframe
 	dataset['Title'] = dataset.Name.str.extract(' ([A-Za-z]+)\.', expand=False)
 	dataset.Title.replace(['Ms', 'Mlle', 'Mme'], ['Miss', 'Miss', 'Mrs'], inplace=True)
-	dataset.Title.replace(['Dona', 'Capt', 'Col', 'Don', 'Dr', 'Jonkheer', 'Lady', 'Major', 'Rev', 'Sir', 'Countess'], ['Other', 'Mr', 'Mr', 'Other', 'Other', 'Mr', 'Other', 'Mr', 'Mr', 'Mr', 'Other'], inplace=True) 
+	dataset.Title.replace(['Dona', 'Capt', 'Col', 'Don', 'Dr', 'Jonkheer', 'Lady', 'Major', 'Rev', 'Sir', 'Countess'], ['Other', 'Mr', 'Mr', 'Other', 'Other', 'Mr', 'Royal', 'Mr', 'Mr', 'Royal', 'Royal'], inplace=True) 
 
 	### Create new feature Family_Size
 	dataset['Family_Size'] = dataset['SibSp'] + dataset['Parch'] + 1
@@ -53,7 +53,7 @@ for dataset in combined:
 
 	### Replace non-numeric values with numbers
 	dataset.Sex.replace(['male', 'female'], [0, 1], inplace=True)
-	dataset.Title.replace(['Mr', 'Mrs', 'Miss', 'Master', 'Other'], [0, 1, 2, 3, 4], inplace=True)
+	dataset.Title.replace(['Mr', 'Mrs', 'Miss', 'Master', 'Royal', 'Other'], [0, 1, 2, 3, 4, 5], inplace=True)
 	dataset.Embarked.replace(['C', 'S', 'Q'], [0, 1, 2], inplace=True)
 	print "Initial data processing: COMPLETE"
 
