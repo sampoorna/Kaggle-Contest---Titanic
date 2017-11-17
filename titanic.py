@@ -21,7 +21,7 @@ def applyMedianFare(row, df):
 		return df[(df.Pclass == row['Pclass']) & (df.Embarked == row['Embarked'])]['Fare'].median()
 	return row['Fare']
 	
-def run_kfold(clf, X_all, y_all):
+def runKFold(clf, X_all, y_all):
 	kf = KFold(n_splits=10)
 	outcomes = []
 	fold = 0
@@ -50,7 +50,7 @@ ids = test_df['PassengerId'].tolist()
 y = train_df['Survived'].tolist()
 
 combined = [train_df, test_df]
-#print pd.crosstab(train_df['Age'], train_df['Survived'])
+#print pd.crosstab(train_df['CabinBool'], train_df['Survived'])
 
 for dataset in combined:
 	### Drop ticket info as it is not likely to be very informative
@@ -59,6 +59,9 @@ for dataset in combined:
 	### Replace NaN values
 	dataset.fillna({'Age' : dataset['Age'].median(), 'Embarked' : 'C'}, inplace = True)
 	dataset['Fare'] = dataset.apply(applyMedianFare, df=dataset, axis=1)
+	
+	### Binarize Cabin values to create new feature CabinBool
+	dataset['CabinBool'] = dataset['Cabin'].notnull().astype('int')
 
 	### Extract titles, replace uncommon variations and add as column to dataframe
 	dataset['Title'] = dataset.Name.str.extract(' ([A-Za-z]+)\.', expand=False)
@@ -80,8 +83,8 @@ for dataset in combined:
 ### Transform dataframe to lists
 #X = train_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
 #X_pred = test_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
-X = train_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title']].values.tolist()
-X_pred = test_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title']].values.tolist()
+X = train_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
+X_pred = test_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title', 'CabinBool']].values.tolist()
 
 ### Randomly shuffle training instances
 combo = list(zip(X, y))
@@ -110,13 +113,13 @@ print "Train/test split: COMPLETE"
 clf = svm.SVC(kernel = 'rbf', gamma = 0.001, C = 560, cache_size=500) # 1 overfits more than 0.1 and 0.01
 
 ### Run k-fold cross validation
-run_kfold(clf, np.array(X), np.array(y))
+runKFold(clf, np.array(X), np.array(y))
 
 ### Fit model on entire data for final predictions
 clf.fit(X, y)
 print "Model learning: COMPLETE"
 score = clf.score(X, y)
-print score
+print "Training error: ", score
 predictions = clf.predict(X_pred)
 
 write_file = "output_svm.csv"

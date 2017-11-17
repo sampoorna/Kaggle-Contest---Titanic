@@ -38,3 +38,6 @@ Observations:
 	 - Adding Mother, Family_Size & Title does not yet improve performance, but is better than only adding Family_Size & Title and same as only using Title
 	 - Using ['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother'] is worse than not using Mother, but better than when Family_Size and Title replaced Sibsp and Parch
 	 - Using ['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother', 'Title'] gives us the same error as without Mother ---> Negligible added utility of including Mother
+   - Create new feature CabinBool
+     - Boolean value, = 1 if Cabin has a recorded value, 0 otherwise
+	 - Gives lower score than using ['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother', 'Title']
