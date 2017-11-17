@@ -29,8 +29,11 @@ Observations:
 	 - For Embarked, only 2 rows in the training set have NaN here. We choose 'C'  (Charbourg as port of embarkation) as they paid $80 for first class travel that coincides with how much others from that port and that class paid. ---> This gets us the best score yet
    - Create new feature Family_Size based on Sibsp and Parch
      - Family_Size = Sibsp + Parch + 1 (to include the passenger themselves)
-	 - Surprisingly, adding Family_Size & Title does not yet improve upon the performance
+	 - Adding Family_Size & Title does not yet improve upon the performance
+	 - Adding only Title is better than adding Family_Size & Title
+	 - Replacing SibSp & Parch with Family_Size & Title is worse
    - Create new feature Mother based on age, title and Parch
      - Mother = 1 if their title is not Miss., if Age >= 18, if Parch > 0 and if Sex is female
-	 - Adding Mother, Family_Size & Title does not yet improve performance, but is better than only adding Family_Size & Title
+	 - Adding Mother, Family_Size & Title does not yet improve performance, but is better than only adding Family_Size & Title and same as only using Title
 	 - Using ['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother'] is worse than not using Mother, but better than when Family_Size and Title replaced Sibsp and Parch
+	 - Using ['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother', 'Title'] gives us the same error as without Mother ---> Negligible added utility of including Mother

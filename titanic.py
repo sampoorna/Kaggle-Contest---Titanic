@@ -9,7 +9,7 @@ import random
 import math
 
 def applyMother(row):
-	if row['Age'] >= 18 and row['Title'] != 'Miss.' and row['Parch'] and row['Sex'] == 'female' > 0:
+	if row['Age'] >= 18 and row['Title'] != 'Miss' and row['Parch'] and row['Sex'] == 'female' > 0:
 		return 1
 	return 0
 		
@@ -26,57 +26,42 @@ print "Reading input files: COMPLETE"
 
 ### Save passenger IDs to write to file later
 ids = test_df['PassengerId'].tolist()
-#train_df.drop(['PassengerId', 'Ticket', 'Cabin', 'Name'], axis = 1)
-#test_df.drop(['PassengerId', 'Ticket', 'Cabin', 'Name'], axis = 1)
-
-### Replace NaN values
-train_df.fillna({'Age' : train_df['Age'].median(), 'Embarked' : 'C'}, inplace = True)
-train_df['Fare'] = train_df.apply(applyMedianFare, df=train_df, axis=1)
-
-test_df.fillna({'Age' : test_df['Age'].median()}, inplace = True)
-test_df['Fare'] = test_df.apply(applyMedianFare, df=test_df, axis=1)
 
 ### Training labels
 y = train_df['Survived'].tolist()
-#train_df.drop(['Survived'], axis = 1)
 
-### Extract titles, replace uncommon variations and add as column to dataframe
-names_train = train_df['Name'].tolist()
-names_test = test_df['Name'].tolist()
-titles = [name.split(',')[1].split(' ')[1] for name in names_train]
-train_df['Title'] = titles
-titles = [name.split(',')[1].split(' ')[1] for name in names_test]
-test_df['Title'] = titles
-train_df.Title.replace(['Ms.', 'Mlle.', 'Mme.'], ['Miss.', 'Miss.', 'Mrs.'], inplace=True)
-train_df.Title.replace(['Dona.', 'Capt.', 'Col.', 'Don.', 'Dr.', 'Jonkheer.', 'Lady.', 'Major.', 'Rev.', 'Sir.', 'the'], ['Other', 'Mr.', 'Mr.', 'Other', 'Other', 'Mr.', 'Other', 'Mr.', 'Mr.', 'Mr.', 'Other'], inplace=True) 
-test_df.Title.replace(['Ms.', 'Mlle.', 'Mme.'], ['Miss.', 'Miss.', 'Mrs.'], inplace=True)
-test_df.Title.replace(['Dona.', 'Capt.', 'Col.', 'Don.', 'Dr.', 'Jonkheer.', 'Lady.', 'Major.', 'Rev.', 'Sir.', 'the'], ['Other', 'Mr.', 'Mr.', 'Other', 'Other', 'Mr.', 'Other', 'Mr.', 'Mr.', 'Mr.', 'Other'], inplace=True)
+combined = [train_df, test_df]
 
-### Create new feature Family_Size
-train_df['Family_Size'] = train_df['SibSp'] + train_df['Parch'] + 1
-test_df['Family_Size'] = test_df['SibSp'] + test_df['Parch'] + 1
-#print train_df.Family_Size.unique()
+for dataset in combined:
+	### Drop ticket info as it is not likely to be very informative
+	dataset.drop(['Ticket'], axis = 1)
 
-### Create new feature Mother
-train_df['Mother'] = train_df.apply(applyMother, axis=1)
-test_df['Mother'] = test_df.apply(applyMother, axis=1)
+	### Replace NaN values
+	dataset.fillna({'Age' : dataset['Age'].median(), 'Embarked' : 'C'}, inplace = True)
+	dataset['Fare'] = dataset.apply(applyMedianFare, df=dataset, axis=1)
 
-### Replace non-numeric values with numbers
-train_df.Sex.replace(['male', 'female'], [0, 1], inplace=True)
-test_df.Sex.replace(['male', 'female'], [0, 1], inplace=True)
+	### Extract titles, replace uncommon variations and add as column to dataframe
+	dataset['Title'] = dataset.Name.str.extract(' ([A-Za-z]+)\.', expand=False)
+	dataset.Title.replace(['Ms', 'Mlle', 'Mme'], ['Miss', 'Miss', 'Mrs'], inplace=True)
+	dataset.Title.replace(['Dona', 'Capt', 'Col', 'Don', 'Dr', 'Jonkheer', 'Lady', 'Major', 'Rev', 'Sir', 'Countess'], ['Other', 'Mr', 'Mr', 'Other', 'Other', 'Mr', 'Other', 'Mr', 'Mr', 'Mr', 'Other'], inplace=True) 
 
-train_df.Title.replace(['Mr.', 'Mrs.', 'Miss.', 'Master.', 'Other'], [0, 1, 2, 3, 4], inplace=True)
-test_df.Title.replace(['Mr.', 'Mrs.', 'Miss.', 'Master.', 'Other'], [0, 1, 2, 3, 4], inplace=True)
+	### Create new feature Family_Size
+	dataset['Family_Size'] = dataset['SibSp'] + dataset['Parch'] + 1
 
-train_df.Embarked.replace(['C', 'S', 'Q'], [0, 1, 2], inplace=True)
-test_df.Embarked.replace(['C', 'S', 'Q'], [0, 1, 2], inplace=True)
-print "Initial data processing: COMPLETE"
+	### Create new feature Mother
+	dataset['Mother'] = dataset.apply(applyMother, axis=1)
+
+	### Replace non-numeric values with numbers
+	dataset.Sex.replace(['male', 'female'], [0, 1], inplace=True)
+	dataset.Title.replace(['Mr', 'Mrs', 'Miss', 'Master', 'Other'], [0, 1, 2, 3, 4], inplace=True)
+	dataset.Embarked.replace(['C', 'S', 'Q'], [0, 1, 2], inplace=True)
+	print "Initial data processing: COMPLETE"
 
 ### Transform dataframe to lists
 #X = train_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
 #X_pred = test_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
-X = train_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother']].values.tolist()
-X_pred = test_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Mother']].values.tolist()
+X = train_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title']].values.tolist()
+X_pred = test_df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'Parch', 'SibSp', 'Family_Size', 'Mother', 'Title']].values.tolist()
 
 ### Randomly shuffle training instances
 combo = list(zip(X, y))
