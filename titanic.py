@@ -108,7 +108,7 @@ for dataset in combined:
 	dataset.Sex.replace(['male', 'female'], [0, 1], inplace=True)
 	dataset.Title.replace(['Mr', 'Mrs', 'Miss', 'Master', 'Royal', 'Other'], [0, 1, 2, 3, 4, 5], inplace=True)
 	dataset.Embarked.replace(['C', 'S', 'Q'], [0, 1, 2], inplace=True)
-	print "Initial data processing: COMPLETE"
+print "Initial data processing: COMPLETE"
 
 ### Transform dataframe to lists
 #X = train_df[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked', 'Title', 'Family_Size']].values.tolist()
@@ -133,11 +133,19 @@ print "Train/test split: COMPLETE"
 #C_range = np.logspace(2, 5, 10)
 #gamma_range = np.logspace(-3, 3, 13)
 #print C_range
-#param_grid = dict(C=C_range)
-#cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
-#grid = GridSearchCV(SVC(kernel = 'rbf', gamma=0.001), param_grid=param_grid, cv=cv)
-#grid.fit(X, y)
+#svm_param_grid = dict(C=C_range)
+#svm_grid = GridSearchCV(SVC(kernel = 'rbf', gamma=0.001), param_grid=svm_param_grid, cv=cv)
 #print "The best parameters are ", grid.best_params_, "with a score of", grid.best_score_
+
+ada_param_grid = {"learning_rate" : [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.2, 1.5],
+			  "base_estimator__splitter" : ["best", "random"],
+              "algorithm" : ["SAMME","SAMME.R"],
+              "n_estimators" : [1, 2],
+			  "base_estimator__criterion" : ["gini", "entropy"]}
+cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+ada_grid = GridSearchCV(AdaBoostClassifier(DecisionTreeClassifier(random_state=2)), param_grid=ada_param_grid, cv=cv)
+ada_grid.fit(X, y)
+print "The best parameters are ", ada_grid.best_params_, "with a score of", ada_grid.best_score_
 
 #######################################################################################
 ### Building models
@@ -146,7 +154,7 @@ random_state = 2
 classifiers = []
 classifiers.append({'Name': 'SVM', 'Model': SVC(kernel='rbf', gamma=0.001, C=560, cache_size=500, random_state=random_state)})
 classifiers.append({'Name': 'Decision Tree', 'Model': DecisionTreeClassifier(random_state=random_state)})
-classifiers.append({'Name': 'AdaBoost with Decision Tree', 'Model': AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state),random_state=random_state,learning_rate=0.1)})
+classifiers.append({'Name': 'AdaBoost with Decision Tree', 'Model': AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state),random_state=random_state,learning_rate=ada_grid.best_params_['learning_rate'], n_estimators=ada_grid.best_params_['n_estimators'], algorithm=ada_grid.best_params_['algorithm'], base_estimator__splitter=ada_grid.best_params_['base_estimator__splitter'], base_estimator__criterion=ada_grid.best_params_['base_estimator__criterion'])})
 classifiers.append({'Name': 'Random Forest', 'Model': RandomForestClassifier(random_state=random_state)})
 classifiers.append({'Name': 'Extra Trees', 'Model': ExtraTreesClassifier(random_state=random_state)})
 classifiers.append({'Name': 'Gradient Boosting', 'Model': GradientBoostingClassifier(random_state=random_state)})
