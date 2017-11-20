@@ -55,3 +55,8 @@ Observations:
 3. Using random forests
    - Gives poorer performance than SVM
    - Gives a very high training error (~94%), so is likely overfitting
+   
+4. Comparing different models with cross validation
+   - LDA gives 'variables are collinear' error
+   - Across runs, lowest accuracies given by: KNN, AdaBoost with decision trees, decision trees and random forests
+   - Across runs, best accuracies given by: SVM with RBF kernel, gradient boosting

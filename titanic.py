@@ -3,12 +3,15 @@
 ### Importing libraries
 import numpy as np
 import csv
-from sklearn import svm
-from sklearn.model_selection import StratifiedShuffleSplit
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import make_scorer, accuracy_score
+from sklearn.model_selection import StratifiedShuffleSplit, GridSearchCV, KFold
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, ExtraTreesClassifier, VotingClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
+from sklearn.metrics import make_scorer, accuracy_score
 import pandas as pd
 import random
 import math
@@ -32,7 +35,7 @@ def fillAge(row, df):
 	return row['Age']
 	
 def runKFold(clf, X_all, y_all):
-	kf = StratifiedKFold(n_splits=10)
+	kf = KFold(n_splits=10)
 	outcomes = []
 	fold = 0
 	for train_index, test_index in kf.split(X_all):
@@ -44,7 +47,7 @@ def runKFold(clf, X_all, y_all):
 		predictions = clf.predict(X_test)
 		accuracy = accuracy_score(y_test, predictions)
 		outcomes.append(accuracy)
-		print("Fold {0} accuracy: {1}".format(fold, accuracy))     
+		#print("Fold {0} accuracy: {1}".format(fold, accuracy))     
 	mean_outcome = np.mean(outcomes)
 	#print("Mean Accuracy: {0}".format(mean_outcome))
 	return mean_outcome
@@ -150,7 +153,7 @@ classifiers.append({'Name': 'Gradient Boosting', 'Model': GradientBoostingClassi
 classifiers.append({'Name': 'MLP', 'Model': MLPClassifier(random_state=random_state)})
 classifiers.append({'Name': 'KNN', 'Model': KNeighborsClassifier()})
 classifiers.append({'Name': 'Logistic Regression', 'Model': LogisticRegression(random_state = random_state)})
-classifiers.append({'Name': 'LDA', 'Model': LinearDiscriminantAnalysis()})
+#classifiers.append({'Name': 'LDA', 'Model': LinearDiscriminantAnalysis()})
 
 ### Run k-fold cross validation
 for model in classifiers:
