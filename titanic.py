@@ -1,15 +1,20 @@
+
+#######################################################################################
+### Importing libraries
 import numpy as np
 import csv
 from sklearn import svm
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import make_scorer, accuracy_score
 from sklearn.svm import SVC
 import pandas as pd
 import random
 import math
 
+#######################################################################################
+### Function definitions
 def applyMother(row):
 	if row['Age'] >= 18 and row['Title'] != 'Miss' and row['Parch'] and row['Sex'] == 'female' > 0:
 		return 1
@@ -27,7 +32,7 @@ def fillAge(row, df):
 	return row['Age']
 	
 def runKFold(clf, X_all, y_all):
-	kf = KFold(n_splits=10)
+	kf = StratifiedKFold(n_splits=10)
 	outcomes = []
 	fold = 0
 	for train_index, test_index in kf.split(X_all):
@@ -41,8 +46,10 @@ def runKFold(clf, X_all, y_all):
 		outcomes.append(accuracy)
 		print("Fold {0} accuracy: {1}".format(fold, accuracy))     
 	mean_outcome = np.mean(outcomes)
-	print("Mean Accuracy: {0}".format(mean_outcome))
-		
+	#print("Mean Accuracy: {0}".format(mean_outcome))
+	return mean_outcome
+
+#######################################################################################	
 ### Read files
 train_df = pd.read_csv('train.csv')
 test_df = pd.read_csv('test.csv')
@@ -129,23 +136,39 @@ print "Train/test split: COMPLETE"
 #grid.fit(X, y)
 #print "The best parameters are ", grid.best_params_, "with a score of", grid.best_score_
 
-### Build model
-clf = svm.SVC(kernel = 'rbf', gamma = 0.001, C = 560, cache_size=500) # 1 overfits more than 0.1 and 0.01
+#######################################################################################
+### Building models
+#clf = SVC(kernel = 'rbf', gamma = 0.001, C = 560, cache_size=500) # 1 overfits more than 0.1 and 0.01
+random_state = 2
+classifiers = []
+classifiers.append({'Name': 'SVM', 'Model': SVC(kernel='rbf', gamma=0.001, C=560, cache_size=500, random_state=random_state)})
+classifiers.append({'Name': 'Decision Tree', 'Model': DecisionTreeClassifier(random_state=random_state)})
+classifiers.append({'Name': 'AdaBoost with Decision Tree', 'Model': AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state),random_state=random_state,learning_rate=0.1)})
+classifiers.append({'Name': 'Random Forest', 'Model': RandomForestClassifier(random_state=random_state)})
+classifiers.append({'Name': 'Extra Trees', 'Model': ExtraTreesClassifier(random_state=random_state)})
+classifiers.append({'Name': 'Gradient Boosting', 'Model': GradientBoostingClassifier(random_state=random_state)})
+classifiers.append({'Name': 'MLP', 'Model': MLPClassifier(random_state=random_state)})
+classifiers.append({'Name': 'KNN', 'Model': KNeighborsClassifier()})
+classifiers.append({'Name': 'Logistic Regression', 'Model': LogisticRegression(random_state = random_state)})
+classifiers.append({'Name': 'LDA', 'Model': LinearDiscriminantAnalysis()})
 
 ### Run k-fold cross validation
-runKFold(clf, np.array(X), np.array(y))
+for model in classifiers:
+	print model['Name'], runKFold(model['Model'], np.array(X), np.array(y))
 
 ### Fit model on entire data for final predictions
-clf.fit(X, y)
-print "Model learning: COMPLETE"
-score = clf.score(X, y)
-print "Training error: ", score
-predictions = clf.predict(X_pred)
+#clf.fit(X, y)
+#print "Model learning: COMPLETE"
+# score = clf.score(X, y)
+# print "Training error: ", score
+# predictions = clf.predict(X_pred)
 
-write_file = "output_svm.csv"
-with open(write_file, "wb") as output:
-	writer = csv.writer(output, delimiter=',')
-	writer.writerow(['PassengerId','Survived'])
-	for ind in range(len(predictions)):
-		writer.writerow([ids[ind], predictions[ind]])
-print "Writing results to file: COMPLETE"
+#######################################################################################
+### Writing output to file
+# write_file = "output_svm.csv"
+# with open(write_file, "wb") as output:
+	# writer = csv.writer(output, delimiter=',')
+	# writer.writerow(['PassengerId','Survived'])
+	# for ind in range(len(predictions)):
+		# writer.writerow([ids[ind], predictions[ind]])
+# print "Writing results to file: COMPLETE"
