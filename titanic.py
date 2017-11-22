@@ -139,7 +139,6 @@ print "Train/test split: COMPLETE"
 
 ada_param_grid = {"learning_rate" : [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.2, 1.5],
 			  "base_estimator__splitter" : ["best", "random"],
-              "algorithm" : ["SAMME","SAMME.R"],
               "n_estimators" : [1, 2],
 			  "base_estimator__criterion" : ["gini", "entropy"]}
 cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
@@ -154,7 +153,7 @@ random_state = 2
 classifiers = []
 classifiers.append({'Name': 'SVM', 'Model': SVC(kernel='rbf', gamma=0.001, C=560, cache_size=500, random_state=random_state)})
 classifiers.append({'Name': 'Decision Tree', 'Model': DecisionTreeClassifier(random_state=random_state)})
-classifiers.append({'Name': 'AdaBoost with Decision Tree', 'Model': AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state),random_state=random_state,learning_rate=ada_grid.best_params_['learning_rate'], n_estimators=ada_grid.best_params_['n_estimators'], algorithm=ada_grid.best_params_['algorithm'], base_estimator__splitter=ada_grid.best_params_['base_estimator__splitter'], base_estimator__criterion=ada_grid.best_params_['base_estimator__criterion'])})
+classifiers.append({'Name': 'AdaBoost with Decision Tree', 'Model': AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state, splitter=ada_grid.best_params_['base_estimator__splitter'], criterion=ada_grid.best_params_['base_estimator__criterion']), learning_rate=ada_grid.best_params_['learning_rate'],random_state=random_state,n_estimators=ada_grid.best_params_['n_estimators'])})
 classifiers.append({'Name': 'Random Forest', 'Model': RandomForestClassifier(random_state=random_state)})
 classifiers.append({'Name': 'Extra Trees', 'Model': ExtraTreesClassifier(random_state=random_state)})
 classifiers.append({'Name': 'Gradient Boosting', 'Model': GradientBoostingClassifier(random_state=random_state)})
