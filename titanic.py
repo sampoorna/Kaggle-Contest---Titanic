@@ -130,13 +130,12 @@ print "Train/test split: COMPLETE"
 
 #######################################################################################
 ### Parameter tuning using grid-search
-#C_range = np.logspace(2, 5, 10)
-#gamma_range = np.logspace(-3, 3, 13)
-#print C_range
-#svm_param_grid = dict(C=C_range)
+# SVM
+#svm_param_grid = {"C" : np.logspace(2, 5, 10), "gamma" : np.logspace(-3, 3, 13)}
 #svm_grid = GridSearchCV(SVC(kernel = 'rbf', gamma=0.001), param_grid=svm_param_grid, cv=cv)
-#print "The best parameters are ", grid.best_params_, "with a score of", grid.best_score_
+#print "The best parameters are ", svm_grid.best_params_, "with a score of", svm_grid.best_score_
 
+# AdaBoost
 ada_param_grid = {"learning_rate" : [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.2, 1.5],
 			  "base_estimator__splitter" : ["best", "random"],
               "n_estimators" : [1, 2],
@@ -146,6 +145,7 @@ ada_grid = GridSearchCV(AdaBoostClassifier(DecisionTreeClassifier(random_state=2
 ada_grid.fit(X, y)
 print "The best parameters for AdaBoost are ", ada_grid.best_params_, "with a score of", ada_grid.best_score_
 
+# Extra trees
 et_param_grid = {"bootstrap" : [True, False],
 			  "max_features": [1, 3, 10],
               "min_samples_split": [2, 3, 10],
@@ -156,6 +156,7 @@ et_grid = GridSearchCV(ExtraTreesClassifier(), param_grid=et_param_grid, cv=cv)
 et_grid.fit(X, y)
 print "The best parameters for Extra Trees are ", et_grid.best_params_, "with a score of", et_grid.best_score_
 
+# Random forest
 rf_grid = GridSearchCV(RandomForestClassifier(), param_grid=et_param_grid, cv=cv)
 rf_grid.fit(X, y)
 print "The best parameters for Random Forest are ", rf_grid.best_params_, "with a score of", rf_grid.best_score_
