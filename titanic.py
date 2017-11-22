@@ -144,7 +144,21 @@ ada_param_grid = {"learning_rate" : [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.2, 1.5
 cv = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
 ada_grid = GridSearchCV(AdaBoostClassifier(DecisionTreeClassifier(random_state=2)), param_grid=ada_param_grid, cv=cv)
 ada_grid.fit(X, y)
-print "The best parameters are ", ada_grid.best_params_, "with a score of", ada_grid.best_score_
+print "The best parameters for AdaBoost are ", ada_grid.best_params_, "with a score of", ada_grid.best_score_
+
+et_param_grid = {"bootstrap" : [True, False],
+			  "max_features": [1, 3, 10],
+              "min_samples_split": [2, 3, 10],
+              "min_samples_leaf": [1, 3, 10],
+              "n_estimators" : [100, 300],
+			  "criterion" : ["gini", "entropy"]}
+et_grid = GridSearchCV(ExtraTreesClassifier(), param_grid=et_param_grid, cv=cv)
+et_grid.fit(X, y)
+print "The best parameters for Extra Trees are ", et_grid.best_params_, "with a score of", et_grid.best_score_
+
+rf_grid = GridSearchCV(RandomForestClassifier(), param_grid=et_param_grid, cv=cv)
+rf_grid.fit(X, y)
+print "The best parameters for Random Forest are ", rf_grid.best_params_, "with a score of", rf_grid.best_score_
 
 #######################################################################################
 ### Building models
@@ -155,7 +169,7 @@ classifiers.append({'Name': 'SVM', 'Model': SVC(kernel='rbf', gamma=0.001, C=560
 classifiers.append({'Name': 'Decision Tree', 'Model': DecisionTreeClassifier(random_state=random_state)})
 classifiers.append({'Name': 'AdaBoost with Decision Tree', 'Model': AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state, splitter=ada_grid.best_params_['base_estimator__splitter'], criterion=ada_grid.best_params_['base_estimator__criterion']), learning_rate=ada_grid.best_params_['learning_rate'],random_state=random_state,n_estimators=ada_grid.best_params_['n_estimators'])})
 classifiers.append({'Name': 'Random Forest', 'Model': RandomForestClassifier(random_state=random_state)})
-classifiers.append({'Name': 'Extra Trees', 'Model': ExtraTreesClassifier(random_state=random_state)})
+classifiers.append({'Name': 'Extra Trees', 'Model': ExtraTreesClassifier(random_state=random_state, bootstrap=et_grid.best_params_['bootstrap'], max_features=et_grid.best_params_['max_features'], min_samples_leaf=et_grid.best_params_['min_samples_leaf'], min_samples_split=et_grid.best_params_['min_samples_split'], n_estimators=et_grid.best_params_['n_estimators'], criterion=et_grid.best_params_['criterion'])})
 classifiers.append({'Name': 'Gradient Boosting', 'Model': GradientBoostingClassifier(random_state=random_state)})
 classifiers.append({'Name': 'MLP', 'Model': MLPClassifier(random_state=random_state)})
 classifiers.append({'Name': 'KNN', 'Model': KNeighborsClassifier()})
