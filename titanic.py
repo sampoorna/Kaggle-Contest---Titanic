@@ -161,6 +161,18 @@ rf_grid = GridSearchCV(RandomForestClassifier(), param_grid=et_param_grid, cv=cv
 rf_grid.fit(X, y)
 print "The best parameters for Random Forest are ", rf_grid.best_params_, "with a score of", rf_grid.best_score_
 
+# Gradient boosting
+gb_param_grid = {'loss' : ["deviance"],
+              'n_estimators' : [100,200,300],
+              'learning_rate': [0.1, 0.05, 0.01],
+              'max_depth': [4, 8],
+              'min_samples_leaf': [100,150],
+              'max_features': [0.3, 0.1] 
+              }
+gb_grid = GridSearchCV(GradientBoostingClassifier(), param_grid=gb_param_grid, cv=kfold, scoring="accuracy", n_jobs= 4, verbose = 1)
+gb_grid.fit(X, y)
+print "The best parameters for gradient boosting are ", gb_grid.best_params_, "with a score of", gb_grid.best_score_
+
 #######################################################################################
 ### Building models
 #clf = SVC(kernel = 'rbf', gamma = 0.001, C = 560, cache_size=500) # 1 overfits more than 0.1 and 0.01
